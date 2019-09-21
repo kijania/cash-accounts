@@ -1,4 +1,4 @@
-package com.accounts;
+package com.accounts.boot;
 
 import akka.NotUsed;
 import akka.actor.ActorSystem;
@@ -7,14 +7,13 @@ import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
-import akka.http.javadsl.server.AllDirectives;
-import akka.http.javadsl.server.Route;
 import akka.stream.ActorMaterializer;
 import akka.stream.javadsl.Flow;
+import com.accounts.wiring.ProductionModule;
 
 import java.util.concurrent.CompletionStage;
 
-public class AccountsEndpoint extends AllDirectives {
+public class WebServer {
 
     public static void main(String[] args) throws Exception {
         ActorSystem system = ActorSystem.create("cash-accounts");
@@ -22,9 +21,8 @@ public class AccountsEndpoint extends AllDirectives {
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
-        AccountsEndpoint app = new AccountsEndpoint();
-
-        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
+        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = ProductionModule
+                .INSTANCE.accountsRoute.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost("localhost", 8080), materializer);
 
@@ -34,12 +32,5 @@ public class AccountsEndpoint extends AllDirectives {
         binding
                 .thenCompose(ServerBinding::unbind) // trigger unbinding from the port
                 .thenAccept(unbound -> system.terminate()); // and shutdown when done
-    }
-
-    private Route createRoute() {
-        return concat(
-                path("accounts", () ->
-                        get(() ->
-                                complete("No cash accounts"))));
     }
 }
