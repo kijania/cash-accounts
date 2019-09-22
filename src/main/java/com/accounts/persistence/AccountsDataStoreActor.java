@@ -21,6 +21,11 @@ public class AccountsDataStoreActor extends AbstractActor {
         return receiveBuilder()
                 .match(AccountsDataStoreMessages.GetAccounts.class,
                         getAccounts -> getSender().tell(new Accounts(accounts), getSelf()))
+                .match(AccountsDataStoreMessages.CreateAccount.class,
+                        createAccount -> {
+                            accounts.add(createAccount.getAccount());
+                            getSender().tell(new AccountsDataStoreMessages.Ack(), getSelf());
+                        })
                 .build();
     }
 }

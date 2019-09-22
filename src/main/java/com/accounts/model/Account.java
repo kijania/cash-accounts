@@ -10,7 +10,8 @@ public class Account {
     private final BigDecimal balance;
 
     @JsonCreator
-    public Account(@JsonProperty("ownerName") String ownerName, @JsonProperty("balance") BigDecimal balance) {
+    public Account(@JsonProperty("ownerName") String ownerName,
+                   @JsonProperty("balance") BigDecimal balance) {
         this.ownerName = ownerName;
         this.balance = balance;
     }

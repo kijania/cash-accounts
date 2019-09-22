@@ -3,6 +3,7 @@ package com.accounts.routes;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.http.javadsl.model.HttpRequest;
+import akka.http.javadsl.model.MediaTypes;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.testkit.JUnitRouteTest;
 import akka.http.javadsl.testkit.TestRoute;
@@ -22,11 +23,28 @@ public class AccountRoutesTest extends JUnitRouteTest {
     }
 
     @Test
-    public void testGettingNoAccounts() {
+    public void testListingNoAccounts() {
         route
                 .run(HttpRequest.GET("/accounts"))
                 .assertStatusCode(StatusCodes.OK)
                 .assertMediaType("application/json")
-                .assertEntity("{}");
+                .assertEntity("{\"accounts\":[]}");
+    }
+
+    @Test
+    public void testCreatingAnAccountAndListingSomeAccounts() {
+        route
+                .run(HttpRequest.POST("/accounts")
+                        .withEntity(MediaTypes.APPLICATION_JSON.toContentType(),
+                                "{\"ownerName\": \"Michał Kijania\", \"balance\": 10000}"))
+                .assertStatusCode(StatusCodes.CREATED)
+                .assertMediaType("text/plain")
+                .assertEntity("Account created");
+
+        route
+                .run(HttpRequest.GET("/accounts"))
+                .assertStatusCode(StatusCodes.OK)
+                .assertMediaType("application/json")
+                .assertEntity("{\"accounts\":[{\"balance\":10000,\"ownerName\":\"Michał Kijania\"}]}");
     }
 }

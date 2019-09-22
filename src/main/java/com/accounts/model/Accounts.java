@@ -10,4 +10,7 @@ public class Accounts {
 
     @JsonCreator
     public Accounts(@JsonProperty("accounts") List<Account> accounts) { this.accounts = accounts; }
+
+    public List<Account> getAccounts() { return accounts; }
+
 }
