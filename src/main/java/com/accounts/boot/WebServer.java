@@ -16,13 +16,14 @@ import java.util.concurrent.CompletionStage;
 public class WebServer {
 
     public static void main(String[] args) throws Exception {
-        ActorSystem system = ActorSystem.create("cash-accounts");
+
+        final ActorSystem system = ProductionModule.INSTANCE.actorSystem;
 
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = ProductionModule
-                .INSTANCE.accountsRoute.createRoute().flow(system, materializer);
+                .INSTANCE.accountRoutes.createRoute().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost("localhost", 8080), materializer);
 
