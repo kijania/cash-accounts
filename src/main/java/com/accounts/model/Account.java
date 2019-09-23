@@ -19,4 +19,8 @@ public class Account {
     public String getOwnerName() { return ownerName; }
 
     public BigDecimal getBalance() { return balance; }
+
+    public Account deposit(BigDecimal amount) { return new Account(ownerName, balance.add(amount)); }
+
+    public Account withdraw(BigDecimal amount) { return new Account(ownerName, balance.subtract(amount)); }
 }

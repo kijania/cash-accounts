@@ -23,7 +23,7 @@ public class WebServer {
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = ProductionModule
-                .INSTANCE.accountRoutes.createRoute().flow(system, materializer);
+                .INSTANCE.accountRoutes.routes().flow(system, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost("localhost", 8080), materializer);
 
